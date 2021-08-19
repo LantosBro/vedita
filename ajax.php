@@ -24,7 +24,7 @@ class CProducts
     public function getShownProducts(int $count = 10)
     {
         $stmt = $this->db->stmt_init();
-        $stmt->prepare("SELECT * FROM `Products` WHERE `HIDE` = 0 ORDER BY `id` DESC LIMIT ?");
+        $stmt->prepare("SELECT * FROM `Products` WHERE `HIDE` = 0 ORDER BY `DATE_CREATE` DESC LIMIT ?");
         $stmt->bind_param("i", $count);
         $stmt->execute();
         $result = $stmt->get_result();
