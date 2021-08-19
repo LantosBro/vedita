@@ -37,6 +37,51 @@
 <br>
 
 <script>
+    async function hide(event) {
+        let id = event.target.dataset.id;
+        let response = await fetch('ajax.php?action=hide&id=' + id);
+        if (response.ok) {
+            let result = await response.json();
+            if (result) {
+                event.target.parentElement.parentElement.remove();
+            } else {
+                alert("Ошибка");
+            }
+        } else {
+            alert(response.status);
+        }
+    }
+
+    async function plusQuantity(event) {
+        let id = event.target.dataset.id;
+        let response = await fetch('ajax.php?action=quantity&option=plus&id=' + id);
+        if (response.ok) {
+            let result = await response.json();
+            if (result) {
+                event.target.parentElement.querySelector('span').innerText = parseInt(event.target.parentElement.querySelector('span').innerText) + 1;
+            } else {
+                alert("Ошибка");
+            }
+        } else {
+            alert(response.status);
+        }
+    }
+
+    async function minusQuantity(event) {
+        let id = event.target.dataset.id;
+        let response = await fetch('ajax.php?action=quantity&option=minus&id=' + id);
+        if (response.ok) {
+            let result = await response.json();
+            if (result) {
+                event.target.parentElement.querySelector('span').innerText = parseInt(event.target.parentElement.querySelector('span').innerText) - 1;
+            } else {
+                alert("Ошибка");
+            }
+        } else {
+            alert(response.status);
+        }
+    }
+
     async function main() {
         let response = await fetch('ajax.php?action=getProducts');
         if (response.ok) {
@@ -47,14 +92,28 @@
                 let tr = document.createElement('tr');
                 for (let j in products[i]) {
                     let td = document.createElement('td');
-                    td.innerText = products[i][j];
+                    let span = document.createElement('span');
+                    span.innerText = products[i][j];
+                    td.appendChild(span);
+                    if (j === "PRODUCT_QUANTITY") {
+                        let button = document.createElement('button');
+                        button.innerText = "+";
+                        button.setAttribute('data-id', products[i]["PRODUCT_ID"]);
+                        button.addEventListener('click', plusQuantity);
+                        td.appendChild(button);
+                        button = document.createElement('button');
+                        button.innerText = "-";
+                        button.setAttribute('data-id', products[i]["PRODUCT_ID"]);
+                        button.addEventListener('click', minusQuantity);
+                        td.appendChild(button);
+                    }
                     tr.appendChild(td);
                 }
                 let td = document.createElement('td');
                 let button = document.createElement('button');
                 button.innerText = "Скрыть";
-                button.setAttribute('id', 'hide');
                 button.setAttribute('data-id', products[i]["PRODUCT_ID"]);
+                button.addEventListener('click', hide);
                 td.appendChild(button);
                 tr.appendChild(td);
                 let tbody = document.querySelector('tbody');
@@ -66,6 +125,8 @@
     }
 
     document.addEventListener("DOMContentLoaded", main);
+
+
 </script>
 </body>
 </html>
