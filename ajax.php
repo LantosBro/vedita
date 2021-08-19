@@ -16,21 +16,39 @@ class CProducts
     }
 
     /**
-     * Get all products from DataBase
+     * Get all non-hidden products from DataBase
      *
      * @param int $count
      * @return mixed
      */
-    public function getProducts(int $count = 10)
+    public function getShownProducts(int $count = 10)
     {
         $stmt = $this->db->stmt_init();
-        $stmt->prepare("SELECT * FROM Products ORDER BY id DESC LIMIT ?");
+        $stmt->prepare("SELECT * FROM `Products` WHERE `HIDE` = 0 ORDER BY `id` DESC LIMIT ?");
         $stmt->bind_param("i", $count);
         $stmt->execute();
         $result = $stmt->get_result();
-        $products = $result->fetch_all(MYSQLI_ASSOC);
-        return $products;
+        $stmt->close();
+        return $result->fetch_all(MYSQLI_ASSOC);
     }
+
+    /**
+     *  Close MySQLi connect on destruct
+     */
+    public function __destruct()
+    {
+        $this->db->close();
+    }
+
 }
 
-
+if ($_GET['action'] != '') {
+    $CProducts = new CProducts($db);
+    $json = [];
+    switch ($_GET['action']) {
+        case 'getProducts':
+            $json = json_encode($CProducts->getShownProducts(), JSON_FORCE_OBJECT);
+            break;
+    }
+    echo $json;
+}
